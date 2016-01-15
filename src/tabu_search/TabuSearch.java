@@ -21,30 +21,30 @@ public class TabuSearch {
 
         LongestPath longestPath = new LongestPath(best_pi); // znajdź ścieżkę dla początkowego grafu
         int max = longestPath.calculate(); // długość tej ścieżki
-        System.out.println("Max path = " + max);
+        //System.out.println("Max path = " + max);
         ArrayList<Integer> pathList = longestPath.getLongest_path(); // ścieżka
 
-        int[][] pi = best_pi; // pi będzie grafem początkowym dla każdej iteracji, best_pi - najlepszym rozwiązaniem
+        int[][] pi = best_pi.clone(); // pi będzie grafem początkowym dla każdej iteracji, best_pi - najlepszym rozwiązaniem
         TabuList tabuList = new TabuList(); // używana lista tabu
 
         for (int loop = 0; loop < loopsNumber; loop++) {
-            System.out.println("Loop: " + loop);
+            //System.out.println("Loop: " + loop);
 
             NeighborsGenerator generator = new NeighborsGenerator(pi, null, input, pathList); // wygeneruj otoczenie dla grafu pi
 
             int neigh_max = -1; // długość najkrótszej najdłuższej ścieżki dla grafów z otoczenia 
             while (generator.hasNext()) { // czy są jeszcze jakieś grafy w otoczeniu
                 int[][] next = generator.next(); //pobierz graf z otoczenia
-                System.out.println("Next: " + Arrays.deepToString(next));
+                //System.out.println("Next: " + Arrays.deepToString(next));
                 longestPath = new LongestPath(next); // policz najdłuższą scieżkę
                 int max_neigh_path = longestPath.calculate(); // tutaj jej wartość
-                System.out.println("Path = " + max_neigh_path);
+                //System.out.println("Path = " + max_neigh_path);
                 if (neigh_max < 0 || max_neigh_path <= neigh_max) { // jeżeli jest to pierwszy lub najlepszy graf z otoczenia to zapisz go
                     if(tabuList.contains(generator.getActual_f(), generator.getActual_s()) &&  max_neigh_path >= max) { // chyba, że jesteśmy w tabu list
                         continue;
                     }
                     neigh_max = max_neigh_path;
-                    pi = next; // graf iteracyjny zmienia się w najlepszy graf z otoczenia, więc możemy go zmieniać już tutaj
+                    pi = next.clone(); // graf iteracyjny zmienia się w najlepszy graf z otoczenia, więc możemy go zmieniać już tutaj
                     pathList = longestPath.getLongest_path(); // tak samo jak ścieżkę tego grafu
                     generator.saveFAndS(); // zapisz indeksy zmian, które chcemy zrobić
                 }
@@ -58,13 +58,13 @@ public class TabuSearch {
 
             if (neigh_max < max) { // jeżeli trafiliśmy na lepsze rozwiązanie niż mieliśmy do tej pory to zapiszmy je
                 max = neigh_max;
-                best_pi = pi;
+                best_pi = pi.clone();
             }
-            System.out.println("Max path: " + max); //wypisz aktualnie najlepsze rozwiązanie
+            //System.out.println("Max path: " + max); //wypisz aktualnie najlepsze rozwiązanie
         }
 
         // wypisz rozwiązanie: 
-        System.out.println("\n\n\nmax = " + max); 
+        System.out.println("max = " + max); 
         System.out.println("ans: " + Arrays.deepToString(best_pi));
 
     }

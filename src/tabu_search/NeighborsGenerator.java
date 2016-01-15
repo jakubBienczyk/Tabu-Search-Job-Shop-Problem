@@ -1,6 +1,7 @@
 package tabu_search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class NeighborsGenerator {
 
@@ -24,7 +25,6 @@ public class NeighborsGenerator {
     }
 
     private void getNextBlock() {
-        System.out.println("e: " + e + " s: " + s);
 
         if (s >= 0 && e < 0) { // jeżeli tak jest, to już nie ma bloków
             return;
@@ -66,6 +66,9 @@ public class NeighborsGenerator {
             is_moved = true;
             if (s > 0) { // pod warunkiem, że nie jest to pierwszy blok
                 next = pi.clone();
+                for(int i = 0; i < n; i++){
+                    next[i] = pi[i].clone();
+                }
                 // zamieniamy element s z s+1
                 int a = next[pathList[s + 1] / n][pathList[s + 1] % n];
                 next[pathList[s + 1] / n][pathList[s + 1] % n] = next[pathList[s] / n][pathList[s] % n];
@@ -79,9 +82,13 @@ public class NeighborsGenerator {
         } else { // jeżeli ruszyliśmy już ten blok to zamienamy ostatnie elementy bloku
             if (e < pathList.length - 1) { // o ile nie jest to ostatni blok
                 next = pi.clone();
+                for(int i = 0; i < n; i++){
+                    next[i] = pi[i].clone();
+                }
                 // zamienamy e z e-1
                 int a = next[pathList[e - 1] / n][pathList[e - 1] % n];
-                next[pathList[e - 1] / n][pathList[e - 1] % n] = next[pathList[e] / n][pathList[e] % n];
+                int b = next[pathList[e] / n][pathList[e] % n];
+                next[pathList[e - 1] / n][pathList[e - 1] % n] = b;
                 next[pathList[e] / n][pathList[e] % n] = a;
                 
                 actual_f = e - 1;

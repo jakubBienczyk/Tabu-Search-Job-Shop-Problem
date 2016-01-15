@@ -40,7 +40,7 @@ public class LongestPath {
                 longest_path = paths[i][n - 1];
             }
         }
-        
+
         return max; // zwracamy tylko długość ścieżki, ale tablicę z jej kolejnymi elementami można pobrać z geta
     }
 

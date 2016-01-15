@@ -5,14 +5,13 @@ import java.util.ArrayDeque;
 public class TabuList {
 
     private final ArrayDeque<Pair> tabuList;
-    private int max_size = 1;
+    private static int max_size = 10;
 
     public TabuList() {
         tabuList = new ArrayDeque<>();
     }
 
     public void add(int f, int s) {
-        System.out.println(tabuList);
         tabuList.add(new Pair(f, s));
         if (tabuList.size() > max_size) {
             tabuList.remove();
@@ -61,7 +60,7 @@ public class TabuList {
     }
 
     public void setMax_size(int max_size) {
-        this.max_size = max_size;
+        TabuList.max_size = max_size;
     }
 
 }
