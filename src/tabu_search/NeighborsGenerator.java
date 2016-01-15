@@ -1,7 +1,6 @@
 package tabu_search;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class NeighborsGenerator {
 
@@ -10,9 +9,9 @@ public class NeighborsGenerator {
     private final InputManager input;
     private final Integer[] pathList;
     private int[][] next;
-    private int s, e; //start and end of one block
-    private int to_move; // element to move
-    private boolean is_moved; // if already moved
+    private int s, e;
+    private int actual_f, actual_s, saved_f, saved_s;
+    private boolean is_moved; 
 
     public NeighborsGenerator(int[][] pi, TabuList tabu, InputManager input, ArrayList<Integer> pathList) {
         this.input = input;
@@ -26,18 +25,21 @@ public class NeighborsGenerator {
 
     private void getNextBlock() {
         System.out.println("e: " + e + " s: " + s);
-        if (s >= 0 && e < 0) {
+
+        if (s >= 0 && e < 0) { // jeżeli tak jest, to już nie ma bloków
             return;
         }
-        s = e = e + 1;
+
+        s = e = e + 1; // punkt początkowy
+
         int n = input.getN();
         int size = pathList.length;
-        if (e > size) {
+        if (e > size) { // jeżeli wyszliśmy poza lisę to kończymy
             e = -1;
             return;
         }
 
-        while ((e + 1) < size) {
+        while ((e + 1) < size) { // idziemy na koniec listy
             if (pathList[s] / n == pathList[e + 1] / n) {
                 e++;
             } else {
@@ -45,57 +47,80 @@ public class NeighborsGenerator {
             }
         }
 
-        if (e == s) {
+        if (e == s) { // jeżeli blok jest jednoelementowy to szukamy dalej
             getNextBlock();
         }
-        to_move = s;
-        is_moved = false;
+
+        is_moved = false; // jeszcze nie ruszliśmy tego bloku
     }
 
     public boolean hasNext() {
-        System.out.println("e: " + e + " s: " + s);
+
         int n = input.getN();
-        if (e < 0) {
+
+        if (e < 0) { // jeżeli e < 0 to już nie ma bloków do wykorzystania
             return false;
         }
 
-        if (!is_moved) {
+        if (!is_moved) { // jeżeli jeszcze nie ruszaliśmy tego bloku to zamienamy pierwszy element bloku
             is_moved = true;
-            if (to_move == s + 1) {
+            if (s > 0) { // pod warunkiem, że nie jest to pierwszy blok
                 next = pi.clone();
-                int a = next[pathList[to_move] / n][pathList[to_move] % n];
-                next[pathList[to_move] / n][pathList[to_move] % n] = next[pathList[s] / n][pathList[s] % n] ;
+                // zamieniamy element s z s+1
+                int a = next[pathList[s + 1] / n][pathList[s + 1] % n];
+                next[pathList[s + 1] / n][pathList[s + 1] % n] = next[pathList[s] / n][pathList[s] % n];
                 next[pathList[s] / n][pathList[s] % n] = a;
-                if(to_move == e){
-                    getNextBlock();
-                }
+                actual_f = s;
+                actual_s = s + 1;
                 return true;
+            } else {
+                return hasNext();
             }
-        } else {
-            is_moved = false;
-            if (to_move == e - 1) {
+        } else { // jeżeli ruszyliśmy już ten blok to zamienamy ostatnie elementy bloku
+            if (e < pathList.length - 1) { // o ile nie jest to ostatni blok
                 next = pi.clone();
-                int a = next[pathList[to_move] / n][pathList[to_move] % n];
-                next[pathList[to_move] / n][pathList[to_move] % n] = next[pathList[e] / n][pathList[e] % n] ;
+                // zamienamy e z e-1
+                int a = next[pathList[e - 1] / n][pathList[e - 1] % n];
+                next[pathList[e - 1] / n][pathList[e - 1] % n] = next[pathList[e] / n][pathList[e] % n];
                 next[pathList[e] / n][pathList[e] % n] = a;
-                to_move++;
+                
+                actual_f = e - 1;
+                actual_s = e;
+                
+                getNextBlock(); //skończyliśmy już z tym blokiem - idziemy dalej
                 return true;
+            } else {
+                return false;
             }
-        }
-        
-        if(to_move != e - 1 && to_move != s + 1){
-            if(to_move >= e)
-                getNextBlock();
-            else
-                to_move++;
         }
 
-        
-        return hasNext();
     }
 
     public int[][] next() {
         return next;
     }
+    
+    public void saveFAndS() {
+        saved_f = actual_f;
+        saved_s = actual_s;
+    }
+
+    public int getActual_f() {
+        return actual_f;
+    }
+
+    public int getActual_s() {
+        return actual_s;
+    }
+
+    public int getSaved_f() {
+        return saved_f;
+    }
+
+    public int getSaved_s() {
+        return saved_s;
+    }
+    
+    
 
 }
