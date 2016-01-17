@@ -28,7 +28,7 @@ public class TS {
             for(int i = 1; i < 100; i++){
                 System.out.println("i: " + i);
               //  (new TabuList()).setMax_size(i);
-                (new TabuSearch(Paths.get(System.getProperty("user.dir"), tests_suffixes.get(i)), loopsNumber)).run();
+                (new TabuSearch(Paths.get(System.getProperty("user.dir"), suff), loopsNumber)).run();
             }
         }
     }
