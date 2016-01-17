@@ -24,12 +24,11 @@ public class TS {
     public static void main(String[] args) throws Exception {
         int loopsNumber = 10000;
         //(new TabuSearch(path, loopsNumber)).run();
-        System.out.println(System.getProperty("user.dir"));
         for(String suff : tests_suffixes) {
             for(int i = 1; i < 100; i++){
                 System.out.println("i: " + i);
               //  (new TabuList()).setMax_size(i);
-                (new TabuSearch(Paths.get(System.getProperty("user.dir"), suff), loopsNumber)).run();
+                (new TabuSearch(Paths.get(System.getProperty("user.dir"), tests_suffixes.get(i)), loopsNumber)).run();
             }
         }
     }

@@ -24,7 +24,7 @@ public class InputManager {
     public InputManager(Path path) throws Exception {
         int idx = 0;
         input_m = new int[0][0]; // just so that Java doesn't complain that
-        input_v = new int [0][0]; // it might be uninitialized
+        input_v = new int[0][0]; // it might be uninitialized
         n = 0;
         m = 0;
         
@@ -40,12 +40,10 @@ public class InputManager {
                 if(idx == 0) { // first line of input
                     switch(j) {
                         case 0: n = v; 
-                       // System.out.println("n = " + n);
                         break;
                         case 1: m = v;
                                 input_m = new int[n][m];
                                 input_v = new int[n][m];
-                               // System.out.println("m = " + m);
                                 break;
                         case 2: known_upper_bound = v; break;
                         case 3: known_lower_bound = v; break;
