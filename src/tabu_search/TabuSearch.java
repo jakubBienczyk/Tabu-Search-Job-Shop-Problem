@@ -1,5 +1,6 @@
 package tabu_search;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -9,7 +10,7 @@ public class TabuSearch {
     private final InputManager input;
     private final int loopsNumber;
 
-    public TabuSearch(String path, int loopsNumber) {
+    public TabuSearch(Path path, int loopsNumber) throws Exception {
         input = new InputManager(path); // pobieranie danych
         best_pi = input.getStarter(); // graf początkowy - tutaj trzeba wstawić jakiś algorytm (konstrukcyjny, albo naiwny)
         this.loopsNumber = loopsNumber; // liczba pętli do wykonania
