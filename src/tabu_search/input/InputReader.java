@@ -1,4 +1,4 @@
-package tabu_search;
+package tabu_search.input;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class InputReader {
+public class InputReader implements Input {
 
     final private Path path;
     final private String pathPrefix = "/test/tabu_search/inputs/";
@@ -57,26 +57,32 @@ public class InputReader {
         }
     }
 
+    @Override
     public int getNumberOfMachines() {
         return numberOfMachines;
     }
 
+    @Override
     public int getNumberOfTasks() {
         return numberOfTasks;
     }
 
+    @Override
     public int getKnownLowerBound() {
         return knownLowerBound;
     }
 
+    @Override
     public int getKnownUpperBound() {
         return knownUpperBound;
     }
 
+    @Override
     public int[][] getMachines() {
         return machines;
     }
 
+    @Override
     public int[][] getTimes() {
         return times;
     }

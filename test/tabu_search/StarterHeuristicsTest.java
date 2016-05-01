@@ -1,5 +1,6 @@
 package tabu_search;
 
+import tabu_search.heuristic.StarterHeuristics;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
