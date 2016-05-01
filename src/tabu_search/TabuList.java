@@ -1,25 +1,35 @@
 package tabu_search;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 public class TabuList {
 
-    private final ArrayDeque<Pair> tabuList;
+    private final ArrayList<Pair> tabuList;
     private static int max_size = 10;
 
     public TabuList() {
-        tabuList = new ArrayDeque<>();
+        tabuList = new ArrayList<>();
     }
 
     public void add(int f, int s) {
         tabuList.add(new Pair(f, s));
         if (tabuList.size() > max_size) {
-            tabuList.remove();
+            tabuList.remove(0);
         }
     }
 
     public boolean contains(int f, int s) {
         return tabuList.contains(new Pair(f, s));
+    }
+    
+    public int position(int f, int s){
+        return tabuList.indexOf(new Pair(f, s));
+    }
+    
+    public void remove(int elements){
+        for(int i = 0; i < elements; i++){
+            tabuList.remove(0);
+        }
     }
 
     private class Pair {

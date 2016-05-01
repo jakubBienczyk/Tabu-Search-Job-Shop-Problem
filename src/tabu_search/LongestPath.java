@@ -45,7 +45,7 @@ public class LongestPath {
     }
 
     public void calculate(int m1, int n1) { 
-        System.out.println("calc: m1= " + m1 + ", n1= " + n1);
+        //System.out.println("calc: m1= " + m1 + ", n1= " + n1);
         // każdy z wierzchołków (odpowiadający operacji) może mieć max 2 połączenia 
         // 1) do operacji z tego samego zadania, wykonywanej przed nim
         // 2) do operacji z tej samej maszyny, wykonywanej przed nim

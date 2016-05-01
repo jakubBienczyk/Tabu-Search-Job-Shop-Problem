@@ -18,6 +18,8 @@ public class TabuListTest {
         
         assertTrue(tabu.contains(1, 2));
         assertFalse(tabu.contains(1, 4));
+        assertEquals(tabu.position(1, 2), 0);
+        assertEquals(tabu.position(3, 4), 1);
         
         tabu.add(7, 8);
         

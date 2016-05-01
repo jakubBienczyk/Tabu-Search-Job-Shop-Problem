@@ -66,7 +66,7 @@ public class NeighborsGenerator {
             is_moved = true;
             if (s > 0) { // pod warunkiem, że nie jest to pierwszy blok
                 next = pi.clone();
-                for(int i = 0; i < n; i++){
+                for(int i = 0; i < pi.length; i++){
                     next[i] = pi[i].clone();
                 }
                 // zamieniamy element s z s+1
@@ -82,7 +82,7 @@ public class NeighborsGenerator {
         } else { // jeżeli ruszyliśmy już ten blok to zamienamy ostatnie elementy bloku
             if (e < pathList.length - 1) { // o ile nie jest to ostatni blok
                 next = pi.clone();
-                for(int i = 0; i < n; i++){
+                for(int i = 0; i < pi.length; i++){
                     next[i] = pi[i].clone();
                 }
                 // zamienamy e z e-1
