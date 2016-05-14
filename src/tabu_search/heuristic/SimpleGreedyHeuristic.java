@@ -24,8 +24,8 @@ public class SimpleGreedyHeuristic implements Heuristic {
 
     @Override
     public void generateSolution() {
-        addFirstOperationsFromEveryTaskToOpeartionArray();
         clearGraph();
+        addFirstOperationsFromEveryTaskToOpeartionArray();
         
         while (!operationsArray.isEmpty()) {
             Collections.sort(operationsArray);

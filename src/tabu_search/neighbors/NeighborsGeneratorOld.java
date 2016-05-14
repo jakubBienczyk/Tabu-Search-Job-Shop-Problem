@@ -1,9 +1,11 @@
-package tabu_search;
+package tabu_search.neighbors;
 
+import tabu_search.input.InputManager;
 import java.util.ArrayList;
 import java.util.Arrays;
+import tabu_search.TabuList;
 
-public class NeighborsGenerator {
+public class NeighborsGeneratorOld {
 
     private final int[][] pi;
     private final TabuList tabu;
@@ -14,7 +16,7 @@ public class NeighborsGenerator {
     private int actual_f, actual_s, saved_f, saved_s;
     private boolean is_moved; 
 
-    public NeighborsGenerator(int[][] pi, TabuList tabu, InputManager input, ArrayList<Integer> pathList) {
+    public NeighborsGeneratorOld(int[][] pi, TabuList tabu, InputManager input, ArrayList<Integer> pathList) {
         this.input = input;
         this.pi = pi;
         this.tabu = tabu;

@@ -1,8 +1,8 @@
-package tabu_search;
+package tabu_search.longestPath;
 
 import java.util.ArrayList;
 
-public class LongestPath {
+public class LongestPathOld {
 
     private static int n, m; // n - liczba zadań, m -liczba maszyn
     private static int[][] input_m; // [n][m] - maszyny odpowiadające kolejnym operacjom, dla każdego zadania
@@ -14,7 +14,7 @@ public class LongestPath {
     private final ArrayList<Integer>[][] paths; // najdłuższa ścieżka dla każdego punkt z pi
     private ArrayList<Integer> longest_path; // najdłuższa ścieżka - operacje na niej są indeksowane tak, jak w tej pracy (czyli od 0 do n*m - 1)
 
-    public LongestPath(int[][] pi) {
+    public LongestPathOld(int[][] pi) {
         this.pi = pi;
 
         lengths = new int[m][n];
@@ -108,19 +108,19 @@ public class LongestPath {
     }
 
     public static void setInput_m(int[][] input_m) {
-        LongestPath.input_m = input_m;
+        LongestPathOld.input_m = input_m;
     }
 
     public static void setInput_v(int[][] input_v) {
-        LongestPath.input_v = input_v;
+        LongestPathOld.input_v = input_v;
     }
 
     public static void setN(int n) {
-        LongestPath.n = n;
+        LongestPathOld.n = n;
     }
 
     public static void setM(int m) {
-        LongestPath.m = m;
+        LongestPathOld.m = m;
     }
 
     public ArrayList<Integer> getLongest_path() {

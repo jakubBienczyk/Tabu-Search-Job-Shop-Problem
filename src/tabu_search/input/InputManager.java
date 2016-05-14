@@ -1,4 +1,4 @@
-package tabu_search;
+package tabu_search.input;
 
 import tabu_search.heuristic.StarterHeuristics;
 import java.nio.file.Files;

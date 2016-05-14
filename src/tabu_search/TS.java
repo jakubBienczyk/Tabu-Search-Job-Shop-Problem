@@ -24,7 +24,7 @@ public class TS {
     //);
     
     public static void main(String[] args) throws Exception {
-        int loopsNumber = 200000;
+        int loopsNumber = 2000000;
         tests_suffixes = new ArrayList<>();
         for(int i = 26; i < 27; i++){
             if(i > 9){
@@ -35,7 +35,7 @@ public class TS {
         }
         //(new TabuSearch(path, loopsNumber)).run();
         for(String suff : tests_suffixes) {
-            for(int i = 10; i < 130; i = i + 3){
+            for(int i = 50; i < 130; i = i + 3){
                 System.out.print("size: " + i + ", file: " + suff);
                 (new TabuList()).setMax_size(i);
                 (new TabuSearch(Paths.get(System.getProperty("user.dir"), suff), loopsNumber)).run();
