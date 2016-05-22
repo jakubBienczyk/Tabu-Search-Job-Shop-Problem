@@ -55,7 +55,7 @@ public class LongestPathImpl implements LongestPath {
             OperationVertex lastOperation = findLastOperationOnMachine(machine);
             calculateLongestPathFromOperation(lastOperation);
         }
-        setLongerPath();
+        setLongestPath();
     }
 
     private void clearAuxiliaryArray() {
@@ -76,26 +76,21 @@ public class LongestPathImpl implements LongestPath {
     }
 
     private void calculateLongestPathFromOperation(OperationVertex operation) {
+        if(getPathLengthFromOperation(operation) >= 0) return;
+        
         OperationVertex previousOnMachine = operation.getPreviousOnMachine();
-        OperationVertex previousOnTask = operation.getPreviousOnTask();
-
+        calculateLongestPathFromOperation(previousOnMachine);
         int pathToOperationOnPreviousMachine = getPathLengthFromOperation(previousOnMachine);
-        if (pathToOperationOnPreviousMachine < 0) {
-            calculateLongestPathFromOperation(previousOnMachine);
-        }
-        pathToOperationOnPreviousMachine = getPathLengthFromOperation(previousOnMachine);
-
+        
+        OperationVertex previousOnTask = operation.getPreviousOnTask();
+        calculateLongestPathFromOperation(previousOnTask);
         int pathToOperationOnPreviousTask = getPathLengthFromOperation(previousOnTask);
-        if (pathToOperationOnPreviousTask < 0) {
-            calculateLongestPathFromOperation(previousOnTask);
-        }
-        pathToOperationOnPreviousTask = getPathLengthFromOperation(previousOnTask);
 
         int longerPath = Math.max(pathToOperationOnPreviousMachine, pathToOperationOnPreviousTask);
         longestPathToOperationsOnMachines[operation.getMachine()][operation.getTask()] = longerPath + operation.getTime();
     }
 
-    private void setLongerPath() {
+    private void setLongestPath() {
         longestPath = new ArrayList();
         OperationVertex operation = getOperationWithLongerPathAndSetLongerPathLength();
         setLongerPathFromOperation(operation);
@@ -106,10 +101,11 @@ public class LongestPathImpl implements LongestPath {
         longestPathLength = -1;
 
         for (int machine = 0; machine < machines; machine++) {
-            int longestPathLengthOnMachine = longestPathToOperationsOnMachines[machine][tasks - 1];
+            OperationVertex lastOperationOnMachine = findLastOperationOnMachine(machine);
+            int longestPathLengthOnMachine = longestPathToOperationsOnMachines[machine][lastOperationOnMachine.getTask()];
             if (longestPathLengthOnMachine > longestPathLength) {
                 longestPathLength = longestPathLengthOnMachine;
-                operationVertex = findLastOperationOnMachine(machine);
+                operationVertex = lastOperationOnMachine;
             }
         }
 

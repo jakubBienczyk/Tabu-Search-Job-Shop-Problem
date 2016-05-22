@@ -33,8 +33,9 @@ public class GraphChanger {
         for (int machine = 0; machine < input.getNumberOfMachines(); machine++) {
             OperationVertex operation = firstOperationsOnMachines[machine];
             for (int task = 1; task < input.getNumberOfTasks(); task++) {
-                int time = getOpeartionTime(task, machine);
-                OperationVertex nextOperation = new OperationVertex(task, machine, time);
+                int nextOperationTask = graphTable[machine][task];
+                int nextOperationTime = getOpeartionTime(nextOperationTask, machine);
+                OperationVertex nextOperation = new OperationVertex(nextOperationTask, machine, nextOperationTime);
                 operation.setNextOnMachine(nextOperation);
                 nextOperation.setPreviousOnMachine(operation);
                 operation = nextOperation;

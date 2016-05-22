@@ -15,13 +15,8 @@ public class NeighborsGeneratorImpl implements NeighborsGenerator {
     private OperationVertex operationOnPath;
     private List<OperationVertex> operationsOnOneMachine;
 
-    public NeighborsGeneratorImpl(Graph graph) {
-        this(graph, null);
-    }
+    public NeighborsGeneratorImpl() {
 
-    public NeighborsGeneratorImpl(Graph graph, List longestPath) {
-        this.graph = graph;
-        this.longestPath = longestPath;
     }
 
     @Override
@@ -48,7 +43,6 @@ public class NeighborsGeneratorImpl implements NeighborsGenerator {
         while (longestPathIterator.hasNext()) {
             int machine = operationOnPath.getMachine();
             getOperationsOnMachine(machine);
-
             if (operationsOnOneMachine.size() > 1) {
                 addNeighborhoodFromTheBeginning();
                 addNeighborhoodFromTheEnd();
@@ -69,35 +63,47 @@ public class NeighborsGeneratorImpl implements NeighborsGenerator {
 
     private void addNeighborhoodFromTheBeginning() {
         OperationVertex firstOperationInBlock = operationsOnOneMachine.get(0);
-        int indexOfFirstOperationInBlock = longestPath.indexOf(firstOperationInBlock);
-        if (indexOfFirstOperationInBlock != 0)
+        if (!areAtTheBegginingOrAtTheEnd(firstOperationInBlock, firstOperationInBlock.getNextOnMachine()))
             addNeighborhoodWithReplaced(firstOperationInBlock, firstOperationInBlock.getNextOnMachine());
     }
 
     private void addNeighborhoodFromTheEnd() {
         OperationVertex lastOperationInBlock = operationsOnOneMachine.get(operationsOnOneMachine.size() - 1);
-        int indexOfLastOperationInBlock = longestPath.indexOf(lastOperationInBlock);
-        if (indexOfLastOperationInBlock != longestPath.size() - 1)
-            addNeighborhoodWithReplaced(lastOperationInBlock, lastOperationInBlock.getPreviousOnMachine());
+        if (!areAtTheBegginingOrAtTheEnd(lastOperationInBlock.getPreviousOnMachine(), lastOperationInBlock))
+            addNeighborhoodWithReplaced(lastOperationInBlock.getPreviousOnMachine(), lastOperationInBlock);
+    }
+
+    private boolean areAtTheBegginingOrAtTheEnd(OperationVertex first, OperationVertex second) {
+        return longestPath.indexOf(first) == 0 || longestPath.indexOf(second) == longestPath.size() - 1;
     }
 
     private void addNeighborhoodWithReplaced(OperationVertex op1, OperationVertex op2) {
         Graph newGraph = graph.clone();
-        OperationVertex[] firstOperationsInNewGraph = newGraph.getFirstOperationsOnMachines();
-        replaceOperations(firstOperationsInNewGraph[op1.getMachine()], op1, op2);
+        replaceOperations(newGraph, op1, op2);
 
         int indexOfOp1 = longestPath.indexOf(op1);
         int indexOfOp2 = longestPath.indexOf(op2);
         neighbors.add(new Neighbor(newGraph, indexOfOp1, indexOfOp2));
     }
 
-    private void replaceOperations(OperationVertex firstOperation, OperationVertex op1, OperationVertex op2) {
+    private void replaceOperations(Graph clonedGraph, OperationVertex op1, OperationVertex op2) {
+        OperationVertex firstOperation = clonedGraph.getFirstOperationsOnMachines()[op1.getMachine()];
         OperationVertex op1InGraph = getOperationFromGraph(firstOperation, op1);
         OperationVertex op2InGraph = getOperationFromGraph(firstOperation, op2);
-        op1InGraph.setNextOnMachine(op2InGraph.getNextOnMachine());
-        op2InGraph.setNextOnMachine(op1InGraph);
-        op2InGraph.setPreviousOnMachine(op1InGraph.getPreviousOnMachine());
+        OperationVertex prev = op1InGraph.getPreviousOnMachine();
+        OperationVertex nex = op2InGraph.getNextOnMachine();
+        
+        if(prev != null) prev.setNextOnMachine(op2InGraph);
+        op1InGraph.setNextOnMachine(nex);
         op1InGraph.setPreviousOnMachine(op2InGraph);
+        op2InGraph.setNextOnMachine(op1InGraph);
+        op2InGraph.setPreviousOnMachine(prev);
+        if(nex != null) nex.setPreviousOnMachine(op1InGraph);
+        
+        
+        if(op1.getPreviousOnMachine() == null) {
+            clonedGraph.getFirstOperationsOnMachines()[op1.getMachine()] = op2InGraph;
+        }
     }
 
     private OperationVertex getOperationFromGraph(OperationVertex firstOperationInGraph, OperationVertex op) {

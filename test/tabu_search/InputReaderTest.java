@@ -64,11 +64,11 @@ public class InputReaderTest {
     }
     
     @Test
-    public void testMachinesBiggerThanZero(){
+    public void testMachinesSmallerThanNumberOfMachines(){
         int[][] testMachines = inputReader.getMachines();
         for(int[] machinesPerTask : testMachines){
             for(int machine : machinesPerTask){
-                assertNotSame(0, machine);
+                assertTrue(machine < inputReader.getNumberOfMachines());
             }
         }
     }

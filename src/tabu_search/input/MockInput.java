@@ -1,5 +1,7 @@
 package tabu_search.input;
 
+import java.io.IOException;
+
 public class MockInput implements Input{
 
     @Override
@@ -32,6 +34,11 @@ public class MockInput implements Input{
     public int[][] getTimes() {
         int[][] machines = {{1,5,12},{2,6,11},{3,7,10},{4,8,9}};
         return machines;
+    }
+
+    @Override
+    public void read() throws IOException {
+        
     }
     
 }

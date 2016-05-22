@@ -58,27 +58,33 @@ public class OperationVertex {
 
     @Override
     public String toString() {
-        return "time: " + time + ", task: " + task + ", machine: " + machine + "\n";
+        return "time: " + time + ", task: " + task + ", machine: " + (machine + 1) + "\n";
     }
 
-    public OperationVertex clone(OperationVertex previousOnMachine, OperationVertex previousOnTask) {
+    @Override
+    public OperationVertex clone() {
         OperationVertex clone = new OperationVertex(task, machine, time);
-        clone.setPreviousOnMachine(previousOnMachine);
-        clone.setPreviousOnTask(previousOnTask);
-
-        if (nextOnMachine != null)
-            clone.setNextOnMachine(nextOnMachine.clone(clone, clone));
-        if (nextOnTask != null)
-            clone.setNextOnTask(nextOnTask.clone(clone, clone));
-
         return clone;
     }
 
-    public boolean equals(OperationVertex op) {
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) return false;
+        if (! (object instanceof OperationVertex)) return false;
+        OperationVertex op = (OperationVertex) object;
         if (op.getMachine() != machine)
             return false;
         if (op.getTask() != task)
             return false;
         return op.getTime() == time;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + this.time;
+        hash = 29 * hash + this.task;
+        hash = 29 * hash + this.machine;
+        return hash;
     }
 }

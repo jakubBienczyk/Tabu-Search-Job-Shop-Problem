@@ -19,14 +19,15 @@ public class NeighborsGeneratorImplTest {
         Graph graph = generateMockGraph();
         Input input = new MockInput();
         List<OperationVertex> longestPath =generateLongestPath(input, graph);
-        generator = new NeighborsGeneratorImpl(graph, longestPath);
+        generator = new NeighborsGeneratorImpl();
+        generator.setGraph(graph);
+        generator.setLongestPath(longestPath);
         generator.calculate();
         neighbors = generator.getNeighbors();
     }
 
     @Test
     public void testNeighborsSize() {
-        System.out.println(neighbors);
         assertTrue(neighbors.size() == 4);
     }
     

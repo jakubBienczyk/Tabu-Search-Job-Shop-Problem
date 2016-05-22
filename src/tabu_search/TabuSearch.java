@@ -1,103 +1,134 @@
 package tabu_search;
 
-import tabu_search.neighbors.NeighborsGeneratorOld;
-import tabu_search.longestPath.LongestPathOld;
-import tabu_search.input.InputManager;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.PrintStream;
+import tabu_search.graph.Graph;
+import tabu_search.input.Input;
+import tabu_search.longestPath.LongestPath;
+import tabu_search.neighbors.Neighbor;
+import tabu_search.neighbors.NeighborsGenerator;
 
 public class TabuSearch {
 
-    private int[][] best_pi; // [m][n] - graf (najpierw początkowy, później najlepszy)
-    private final InputManager input;
+    private final Input input;
+    private Graph graph, bestSolution;
+    private LongestPath longestPath;
     private final int loopsNumber;
-
-    public TabuSearch(Path path, int loopsNumber) throws Exception {
-        input = new InputManager(path); // pobieranie danych
-        best_pi = input.getStarter(); // graf początkowy - tutaj trzeba wstawić jakiś algorytm (konstrukcyjny, albo naiwny)
-        this.loopsNumber = loopsNumber; // liczba pętli do wykonania
+    private final NeighborsGenerator generator;
+    private Neighbor bestNeighbor;
+    private boolean isBestNeighborFromTabu;
+    private int positionOnTabuList, bestNeighborPath;
+    private final TabuList tabuList;
+    private int bestSolutionPath;
+    private PrintStream printStream;
+    
+    public TabuSearch(TabuSearchBuilder builder, int loopsNumber) {
+        this.input = builder.getInput();
+        this.graph = builder.getGraph();
+        bestSolution = graph;
+        this.longestPath = builder.getLongestPath();
+        this.loopsNumber = loopsNumber;
+        this.generator = builder.getNeighborsGenerator();
+        this.tabuList = builder.getTabuList();
+        this.printStream = builder.getStream();
     }
 
     public void run() {
-
-        setLongestPath(); // ustawienie statycznych zmiennych do liczenia najdłuższej ścieżki
-
-        LongestPathOld longestPath = new LongestPathOld(best_pi); // znajdź ścieżkę dla początkowego grafu
-        int max = longestPath.calculate(); // długość tej ścieżki
-        //System.out.println("Max path = " + max);
-        ArrayList<Integer> pathList = longestPath.getLongest_path(); // ścieżka
-
-        int[][] pi = best_pi.clone(); // pi będzie grafem początkowym dla każdej iteracji, best_pi - najlepszym rozwiązaniem
-        TabuList tabuList = new TabuList(); // używana lista tabu
-
+        tabuList.clear();
+        bestSolutionPath = 0;
         for (int loop = 0; loop < loopsNumber; loop++) {
-            //System.out.println("Loop: " + loop);
-
-            NeighborsGeneratorOld generator = new NeighborsGeneratorOld(pi, null, input, pathList); // wygeneruj otoczenie dla grafu pi
-
-            boolean isNotOnTabu = false;
-            boolean fromTabu = false;
-            int position = -1;
-            int neigh_max = -1; // długość najkrótszej najdłuższej ścieżki dla grafów z otoczenia 
-            while (generator.hasNext()) { // czy są jeszcze jakieś grafy w otoczeniu
-                int[][] next = generator.next(); //pobierz graf z otoczenia
-                //System.out.println("Next: " + Arrays.deepToString(next));
-                longestPath = new LongestPathOld(next); // policz najdłuższą scieżkę
-                int max_neigh_path = longestPath.calculate(); // tutaj jej wartość
-                //System.out.println("Path = " + max_neigh_path);
-                if (neigh_max < 0 || max_neigh_path <= neigh_max || fromTabu) { // jeżeli jest to pierwszy lub najlepszy graf z otoczenia to zapisz go
-                    if (tabuList.contains(generator.getActual_f(), generator.getActual_s()) && max_neigh_path >= max) { // chyba, że jesteśmy w tabu list
-                        if (isNotOnTabu) {
-                            continue;
-                        } else {
-                            int next_position = tabuList.position(generator.getActual_f(), generator.getActual_s());
-                            if (position < 0 || next_position <= position) {
-                                position = next_position;
-                                fromTabu = true;
-                            } else {
-                                continue;
-                            }
-                        }
-                    } else {
-                        isNotOnTabu = true;
-                        fromTabu = false;
-                    }
-                    neigh_max = max_neigh_path;
-                    pi = next.clone(); // graf iteracyjny zmienia się w najlepszy graf z otoczenia, więc możemy go zmieniać już tutaj
-                    pathList = longestPath.getLongest_path(); // tak samo jak ścieżkę tego grafu
-                    generator.saveFAndS(); // zapisz indeksy zmian, które chcemy zrobić
-                }
-            }
-
-            if (neigh_max < 0) {
-                break;
-            } else {
-                if (position >= 0 && fromTabu) {
-                    tabuList.remove(position);
-                }
-            }
-
-
-            tabuList.add(generator.getSaved_f(), generator.getSaved_s());
-
-            if (neigh_max < max) { // jeżeli trafiliśmy na lepsze rozwiązanie niż mieliśmy do tej pory to zapiszmy je
-                max = neigh_max;
-                best_pi = pi.clone();
-            }
-            //System.out.println("Max path: " + max); //wypisz aktualnie najlepsze rozwiązanie
+            generateNeighbors();
+            adjustVariables();
+            generator.getNeighbors().stream().forEach((neighbor) -> checkNeighbor(neighbor));
+            graph = bestNeighbor.getGraph();
+            saveBestNeighbor();
+            manageTabuList();
         }
-
-        // wypisz rozwiązanie: 
-        System.out.println(", ub = " + input.getKnownUB() + " max = " + max + " ratio = " + (max * 1.0 / input.getKnownUB()));
-        //System.out.println("ans: " + Arrays.deepToString(best_pi));
-
+        printScore(bestSolutionPath);
     }
 
-    private void setLongestPath() { // ustawienie statycznych zmiennych do liczenia najdłuższej ścieżki
-        LongestPathOld.setInput_m(input.getInput_m());
-        LongestPathOld.setInput_v(input.getInput_v());
-        LongestPathOld.setM(input.getM());
-        LongestPathOld.setN(input.getN());
+    private void adjustVariables() {
+        bestNeighbor = null;
+        bestNeighborPath = 0;
+        positionOnTabuList = -1;
+        isBestNeighborFromTabu = false;
     }
+
+    private void generateNeighbors() {
+        longestPath.setGraph(graph);
+        longestPath.calculate();
+        generator.setGraph(graph);
+        generator.setLongestPath(longestPath.getPath());
+        generator.calculate();
+    }
+
+    private void checkNeighbor(Neighbor neighbor) {
+        longestPath.setGraph(neighbor.getGraph());
+        longestPath.calculate();
+        int pathLength = longestPath.getPathLength();
+        boolean isNeighborFromTabu = tabuList.contains(neighbor.getFirstVertexIndexOnLongestPath(), neighbor.getSecondVertexIndexOnLongestPath());
+        if (bestNeighbor == null)
+            firstNeighbor(neighbor, pathLength);
+        else if (bestSolutionPath > pathLength)
+            bestNeighbor(neighbor, pathLength);
+        else if (isBestNeighborFromTabu && isNeighborFromTabu)
+            neighborFromTabu(neighbor, pathLength);
+        else if ((bestNeighborPath >= pathLength || isBestNeighborFromTabu) && !isNeighborFromTabu)
+            neighborNotFromTabu(neighbor, pathLength);
+    }
+
+    private void saveBestNeighbor() {
+        if (bestSolutionPath == 0 || bestSolutionPath > bestNeighborPath) {
+            bestSolutionPath = bestNeighborPath;
+            bestSolution = graph;
+        }
+    }
+
+    private void manageTabuList() {
+        if (!isBestNeighborFromTabu && positionOnTabuList >= 0)
+            tabuList.remove(positionOnTabuList);
+        tabuList.add(bestNeighbor.getFirstVertexIndexOnLongestPath(), bestNeighbor.getSecondVertexIndexOnLongestPath());
+    }
+
+    private void firstNeighbor(Neighbor neighbor, int pathLength) {
+        bestNeighbor = neighbor;
+        bestNeighborPath = pathLength;
+        isBestNeighborFromTabu = tabuList.contains(neighbor.getFirstVertexIndexOnLongestPath(), neighbor.getSecondVertexIndexOnLongestPath());
+        if (isBestNeighborFromTabu)
+            positionOnTabuList = tabuList.position(neighbor.getFirstVertexIndexOnLongestPath(), neighbor.getSecondVertexIndexOnLongestPath());
+    }
+
+    private void bestNeighbor(Neighbor neighbor, int pathLength) {
+        isBestNeighborFromTabu = false;
+        bestNeighbor = neighbor;
+        bestNeighborPath = pathLength;
+    }
+
+    private void neighborFromTabu(Neighbor neighbor, int pathLength) {
+        int neighborPosition = tabuList.position(
+                neighbor.getFirstVertexIndexOnLongestPath(),
+                neighbor.getSecondVertexIndexOnLongestPath());
+        if (!isPostionOnTabuListSmaller(neighborPosition))
+            return;
+        isBestNeighborFromTabu = true;
+        positionOnTabuList = neighborPosition;
+        bestNeighbor = neighbor;
+        bestNeighborPath = pathLength;
+    }
+
+    private void neighborNotFromTabu(Neighbor neighbor, int pathLength) {
+        isBestNeighborFromTabu = false;
+        bestNeighbor = neighbor;
+        bestNeighborPath = pathLength;
+    }
+
+    private boolean isPostionOnTabuListSmaller(int neighborPosition) {
+        return neighborPosition <= positionOnTabuList || positionOnTabuList < 0;
+    }
+
+    private void printScore(int bestSolutionPath) {
+        printStream.println(" ub = " + input.getKnownUpperBound()
+                + " max = " + bestSolutionPath
+                + " ratio = " + (bestSolutionPath * 1.0 / input.getKnownUpperBound()));
+    }
+
 }

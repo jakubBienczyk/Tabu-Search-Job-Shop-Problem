@@ -5,9 +5,14 @@ import java.util.ArrayList;
 public class TabuList {
 
     private final ArrayList<Pair> tabuList;
-    private static int max_size = 10;
+    private final int max_size;
 
     public TabuList() {
+        this(10);
+    }
+    
+    public TabuList(int size) {
+        max_size = size;
         tabuList = new ArrayList<>();
     }
 
@@ -30,6 +35,10 @@ public class TabuList {
         for(int i = 0; i < elements; i++){
             tabuList.remove(0);
         }
+    }
+    
+    public void clear() {
+        tabuList.clear();
     }
 
     private class Pair {
@@ -64,13 +73,9 @@ public class TabuList {
 
         @Override
         public String toString() {
-            return "(" + f + ", " + s + ")"; //To change body of generated methods, choose Tools | Templates.
+            return "(" + f + ", " + s + ")"; 
         }
 
-    }
-
-    public void setMax_size(int max_size) {
-        TabuList.max_size = max_size;
     }
 
 }

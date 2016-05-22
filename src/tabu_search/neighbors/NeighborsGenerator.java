@@ -7,5 +7,5 @@ public interface NeighborsGenerator {
     public void setGraph(Graph graph);
     public void setLongestPath(List path);
     public void calculate();
-    public List getNeighbors();
+    public List<Neighbor> getNeighbors();
 }
